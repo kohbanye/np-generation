@@ -12,14 +12,21 @@ aiohttp==3.9.5
     # via fsspec
 aiosignal==1.3.1
     # via aiohttp
+appdirs==1.4.4
+    # via wandb
 async-timeout==4.0.3
     # via aiohttp
 attrs==23.2.0
     # via aiohttp
 certifi==2024.2.2
     # via requests
+    # via sentry-sdk
 charset-normalizer==3.3.2
     # via requests
+click==8.1.7
+    # via wandb
+docker-pycreds==0.4.0
+    # via wandb
 filelock==3.14.0
     # via huggingface-hub
     # via torch
@@ -32,6 +39,10 @@ fsspec==2024.3.1
     # via huggingface-hub
     # via pytorch-lightning
     # via torch
+gitdb==4.0.11
+    # via gitpython
+gitpython==3.1.43
+    # via wandb
 huggingface-hub==0.23.0
     # via tokenizers
     # via transformers
@@ -93,12 +104,17 @@ packaging==24.0
     # via transformers
 pillow==10.3.0
     # via rdkit
+protobuf==4.25.3
+    # via wandb
+psutil==5.9.8
+    # via wandb
 pytorch-lightning==2.2.4
     # via np-generation
 pyyaml==6.0.1
     # via huggingface-hub
     # via pytorch-lightning
     # via transformers
+    # via wandb
 rdkit==2023.9.6
     # via np-generation
 regex==2024.4.28
@@ -106,10 +122,20 @@ regex==2024.4.28
 requests==2.31.0
     # via huggingface-hub
     # via transformers
+    # via wandb
 safetensors==0.4.3
     # via transformers
+sentry-sdk==2.0.1
+    # via wandb
+setproctitle==1.3.3
+    # via wandb
 setuptools==69.5.1
     # via lightning-utilities
+    # via wandb
+six==1.16.0
+    # via docker-pycreds
+smmap==5.0.1
+    # via gitdb
 sympy==1.12
     # via torch
 tokenizers==0.19.1
@@ -136,5 +162,8 @@ typing-extensions==4.11.0
     # via torch
 urllib3==2.2.1
     # via requests
+    # via sentry-sdk
+wandb==0.16.6
+    # via np-generation
 yarl==1.9.4
     # via aiohttp
