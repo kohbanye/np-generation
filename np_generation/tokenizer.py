@@ -10,6 +10,7 @@ from tokenizers.pre_tokenizers import Whitespace
 UNK_TOKEN = "[UNK]"
 CLS_TOKEN = "[CLS]"
 SEP_TOKEN = "[SEP]"
+PAD_TOKEN = "[PAD]"
 
 
 class SmilesTokenizer(BaseTokenizer):
@@ -20,19 +21,16 @@ class SmilesTokenizer(BaseTokenizer):
         tokenizer.pre_tokenizer = Whitespace()
         tokenizer.post_processor = processors.TemplateProcessing(
             single=f"{CLS_TOKEN} $0 {SEP_TOKEN}",
-            special_tokens=[(CLS_TOKEN, 1), (SEP_TOKEN, 0)],
+            special_tokens=[(CLS_TOKEN, 1), (SEP_TOKEN, 0), (PAD_TOKEN, 2)],
         )
         super().__init__(tokenizer)
 
     def train(self, files):
         trainer = trainers.BpeTrainer(
-            special_tokens=[UNK_TOKEN, CLS_TOKEN, SEP_TOKEN],
+            special_tokens=[UNK_TOKEN, CLS_TOKEN, SEP_TOKEN, PAD_TOKEN],
             initial_alphabet=self.alphabet,
         )
         self._tokenizer.train(files, trainer=trainer)
-
-    def save(self, path):
-        self._tokenizer.model.save(path)
 
 
 @dataclass(init=True, eq=False, repr=True, frozen=True)

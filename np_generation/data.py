@@ -3,9 +3,7 @@ import requests
 from typing import Literal
 import pytorch_lightning as pl
 import torch
-from transformers import DataCollatorForLanguageModeling
-
-from .tokenizer import SmilesTokenizer
+from transformers import DataCollatorForLanguageModeling, PreTrainedTokenizerFast
 
 COCONUT_CANONICAL_SMILES = "https://coconut.naturalproducts.net/download/smiles"
 COCONUT_ABSOLUTE_SMILES = "https://coconut.naturalproducts.net/download/absolutesmiles"
@@ -33,14 +31,26 @@ def _download_data(
         f.write(response.content)
 
 
+class SmilesDataset(torch.utils.data.Dataset):
+    def __init__(self, input_ids):
+        self.input_ids = input_ids
+
+    def __len__(self):
+        return len(self.input_ids)
+
+    def __getitem__(self, idx):
+        return self.input_ids[idx]
+
+
 class DataModule(pl.LightningDataModule):
     def __init__(
         self,
-        tokenizer: SmilesTokenizer,
+        tokenizer: PreTrainedTokenizerFast,
         split_ratio=0.9,
-        batch_size=32,
+        batch_size=16,
         num_workers=4,
-        data_dir="model",
+        max_length=512,
+        data_dir="data",
         filename="coconut.smi",
         smiles_type="canonical",
     ):
@@ -49,6 +59,7 @@ class DataModule(pl.LightningDataModule):
         self.split_ratio = split_ratio
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.max_length = max_length
         self.data_dir = data_dir
         self.filename = filename
         self.smiles_type = smiles_type
@@ -65,29 +76,51 @@ class DataModule(pl.LightningDataModule):
             )
         with open(os.path.join(self.data_dir, self.filename)) as f:
             self.smiles_list = f.read().splitlines()
-        self.input_ids = self.tokenizer.encode_batch(self.smiles_list)
+
+        if os.path.exists(os.path.join(self.data_dir, "input_ids.pt")):
+            self.input_ids = torch.load(os.path.join(self.data_dir, "input_ids.pt"))
+        else:
+            self.input_ids = self.tokenizer(
+                self.smiles_list,
+                padding=True,
+                truncation=True,
+                max_length=self.max_length,
+                return_tensors="pt",
+            )["input_ids"]
+            torch.save(self.input_ids, os.path.join(self.data_dir, "input_ids.pt"))
 
     def setup(self, stage: str) -> None:
-        train_size = int(self.split_ratio * len(self.input_ids))
-        val_size = len(self.input_ids) - train_size
+        if not os.path.exists(os.path.join(self.data_dir, "input_ids.pt")):
+            raise ValueError("Tokenized data is not exist.")
+        self.input_ids = torch.load(os.path.join(self.data_dir, "input_ids.pt"))
+
+        full_dataset = SmilesDataset(self.input_ids)
+        num_train = int(len(full_dataset) * self.split_ratio)
+        num_val = len(full_dataset) - num_train
         self.train_dataset, self.val_dataset = torch.utils.data.random_split(
-            self.input_ids, [train_size, val_size]
+            full_dataset, [num_train, num_val]
         )
 
     def train_dataloader(self):
+        if len(self.train_dataset) == 0:
+            raise ValueError("Training dataset is empty.")
         return torch.utils.data.DataLoader(
             self.train_dataset,
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.num_workers,
             collate_fn=self.collate_fn,
+            pin_memory=True,
         )
 
     def val_dataloader(self):
+        if len(self.val_dataset) == 0:
+            raise ValueError("Validation dataset is empty.")
         return torch.utils.data.DataLoader(
             self.val_dataset,
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.num_workers,
             collate_fn=self.collate_fn,
+            pin_memory=True,
         )

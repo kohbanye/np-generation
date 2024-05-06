@@ -18,27 +18,21 @@ class NpGptModel(pl.LightningModule):
         return lm_logits
 
     def training_step(self, batch, batch_idx):
-        input_ids, attention_mask, labels = batch
-        outputs = self(input_ids, attention_mask=attention_mask)
+        input_ids, labels = batch["input_ids"], batch["labels"]
+        outputs = self(input_ids)
         loss = nn.CrossEntropyLoss()(
             outputs.view(-1, self.config.vocab_size), labels.view(-1)
         )
         self.log("train_loss", loss)
         return loss
 
-    def on_train_epoch_end(self, outputs):
-        loss = torch.stack([x["loss"] for x in outputs]).mean()
-        self.log("train_loss_epoch", loss)
-
-        self.transformer.save_pretrained("logs")
-
     def validation_step(self, batch, batch_idx):
-        input_ids, attention_mask, labels = batch
-        outputs = self(input_ids, attention_mask=attention_mask)
+        input_ids, labels = batch["input_ids"], batch["labels"]
+        outputs = self(input_ids)
         loss = nn.CrossEntropyLoss()(
             outputs.view(-1, self.config.vocab_size), labels.view(-1)
         )
-        self.log("val_loss", loss)
+        self.log("val_loss", loss, sync_dist=True)
         return loss
 
     def configure_optimizers(self):
