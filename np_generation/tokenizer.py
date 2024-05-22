@@ -21,7 +21,7 @@ class SmilesTokenizer(BaseTokenizer):
         tokenizer.pre_tokenizer = Whitespace()
         tokenizer.post_processor = processors.TemplateProcessing(
             single=f"{CLS_TOKEN} $0 {SEP_TOKEN}",
-            special_tokens=[(CLS_TOKEN, 1), (SEP_TOKEN, 0), (PAD_TOKEN, 2)],
+            special_tokens=[(CLS_TOKEN, 1), (SEP_TOKEN, 2)],
         )
         super().__init__(tokenizer)
 
