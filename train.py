@@ -52,7 +52,9 @@ def main():
     )
     model = NpGptModel(config)
 
-    logger = pl.loggers.WandbLogger(project="np-generation")
+    logger = pl.loggers.WandbLogger(
+        project="np-generation", save_dir=model_dir, log_model=True
+    )
     trainer = pl.Trainer(
         devices=4,
         strategy="ddp",
