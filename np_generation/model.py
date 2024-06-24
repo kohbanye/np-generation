@@ -10,7 +10,9 @@ class NpGptModel(pl.LightningModule):
         self.transformer = GPT2LMHeadModel(config)
 
     def forward(self, input_ids, labels, attention_mask=None):
-        outputs = self.transformer(input_ids, labels=labels, attention_mask=attention_mask)
+        outputs = self.transformer(
+            input_ids=input_ids, labels=labels, attention_mask=attention_mask
+        )
         return outputs
 
     def training_step(self, batch, batch_idx):
@@ -27,3 +29,6 @@ class NpGptModel(pl.LightningModule):
 
     def configure_optimizers(self):
         return torch.optim.AdamW(self.parameters(), lr=5e-5)
+
+    def save(self, save_dir):
+        self.transformer.save_pretrained(save_dir)
