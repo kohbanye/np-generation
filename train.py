@@ -8,12 +8,17 @@ from np_generation.model import NpGptModel
 from np_generation.tokenizer import SmilesTokenizer
 
 ROOT_DIR = os.environ["ROOT_DIR"]
+CHIRAL_TRAINING = os.environ["CHIRAL_TRAINING"]
 
 
 def main():
     data_dir = os.path.join(ROOT_DIR, "data")
-    model_dir = os.path.join(ROOT_DIR, "model")
-    smiles_filename = "coconut_chiral.smi"
+    if CHIRAL_TRAINING:
+        model_dir = os.path.join(ROOT_DIR, "model", "chiral")
+        smiles_filename = "coconut_chiral.smi"
+    else:
+        model_dir = os.path.join(ROOT_DIR, "model", "no_chiral")
+        smiles_filename = "coconut.smi"
     checkpoint_path = os.path.join(model_dir, "checkpoint.ckpt")
     tokenizer_path = os.path.join(model_dir, "tokenizer.json")
 
@@ -61,12 +66,13 @@ def main():
         accelerator="gpu",
         max_epochs=30,
         logger=logger,
-        default_root_dir=os.path.join(ROOT_DIR, "model"),
+        default_root_dir=model_dir,
         enable_checkpointing=True,
     )
 
     trainer.fit(model, datamodule)
     trainer.save_checkpoint(checkpoint_path)
+    model.save(model_dir)
 
 
 if __name__ == "__main__":
