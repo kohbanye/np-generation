@@ -2,22 +2,20 @@ import os
 from transformers import GPT2Config, PreTrainedTokenizerFast
 import pytorch_lightning as pl
 import torch
+import argparse
 
 from np_generation.data import DataModule
 from np_generation.model import NpGptModel
 from np_generation.tokenizer import SmilesTokenizer
 
-ROOT_DIR = os.environ["ROOT_DIR"]
-CHIRAL_TRAINING = os.environ["CHIRAL_TRAINING"]
 
-
-def main():
-    data_dir = os.path.join(ROOT_DIR, "data")
-    if CHIRAL_TRAINING:
-        model_dir = os.path.join(ROOT_DIR, "model", "chiral")
+def train(root_dir: str, chiral_training: bool, use_pretrained: bool):
+    data_dir = os.path.join(root_dir, "data")
+    if chiral_training:
+        model_dir = os.path.join(root_dir, "model", "chiral")
         smiles_filename = "coconut_chiral.smi"
     else:
-        model_dir = os.path.join(ROOT_DIR, "model", "no_chiral")
+        model_dir = os.path.join(root_dir, "model", "no_chiral")
         smiles_filename = "coconut.smi"
     checkpoint_path = os.path.join(model_dir, "checkpoint.ckpt")
     tokenizer_path = os.path.join(model_dir, "tokenizer.json")
@@ -73,6 +71,27 @@ def main():
     trainer.fit(model, datamodule)
     trainer.save_checkpoint(checkpoint_path)
     model.save(model_dir)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Training script for chemical language model"
+    )
+
+    parser.add_argument("root", help="Root directory for data and models")
+    parser.add_argument(
+        "--chiral",
+        action=argparse.BooleanOptionalAction,
+        help="Whether to train on chiral dataset",
+    )
+    parser.add_argument(
+        "--use-pretrained",
+        action=argparse.BooleanOptionalAction,
+        help="Whether to train pretrained model",
+    )
+
+    args = parser.parse_args()
+    train(args.root, args.chiral, args.use_pretrained)
 
 
 if __name__ == "__main__":
