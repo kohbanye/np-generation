@@ -53,7 +53,10 @@ def train(root_dir: str, chiral_training: bool, use_pretrained: bool):
         attn_pdrop=0.1,
         layer_norm_epsilon=1e-5,
     )
+
     model = NpGptModel(config)
+    if use_pretrained:
+        model.load(model_dir)
 
     logger = pl.loggers.WandbLogger(
         project="np-generation", save_dir=model_dir, log_model=True

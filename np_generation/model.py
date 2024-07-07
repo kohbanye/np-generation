@@ -32,3 +32,6 @@ class NpGptModel(pl.LightningModule):
 
     def save(self, save_dir):
         self.transformer.save_pretrained(save_dir)
+
+    def load(self, model_dir):
+        self.transformer = GPT2LMHeadModel.from_pretrained(model_dir)
