@@ -9,7 +9,7 @@ class Generator:
         self.config = config
         if config is None:
             self.config = GenerationConfig(
-                max_length=80,
+                max_length=512,
                 temperature=1.2,
                 do_sample=True,
                 top_p=0.84,
