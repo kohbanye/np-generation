@@ -1,15 +1,24 @@
+import argparse
 import os
-from transformers import GPT2Config, PreTrainedTokenizerFast
+
 import pytorch_lightning as pl
 import torch
-import argparse
+import wandb
+from pytorch_lightning.loggers import WandbLogger
+from transformers import GPT2Config, PreTrainedTokenizerFast
 
 from np_generation.data import DataModule
 from np_generation.model import NpGptModel
 from np_generation.tokenizer import SmilesTokenizer
 
 
-def train(root_dir: str, chiral_training: bool, use_pretrained: bool):
+def train(
+    root_dir: str,
+    chiral_training: bool,
+    use_pretrained: bool,
+    version: str,
+    notes: str,
+):
     data_dir = os.path.join(root_dir, "data")
     if chiral_training:
         model_dir = os.path.join(root_dir, "model", "chiral")
@@ -58,11 +67,17 @@ def train(root_dir: str, chiral_training: bool, use_pretrained: bool):
     if use_pretrained:
         model.load(model_dir)
 
-    logger = pl.loggers.WandbLogger(
-        project="np-generation", save_dir=model_dir, log_model=True
+    logger = WandbLogger(
+        project="np-generation",
+        name=f"{'chiral' if chiral_training else 'no_chiral'}_{version}",
+        version=version,
+        tags=["np-generation", "chiral" if chiral_training else "no_chiral"],
+        notes=notes,
+        save_dir=model_dir,
+        log_model=True,
     )
     trainer = pl.Trainer(
-        devices=4,
+        devices="auto",
         strategy="ddp",
         accelerator="gpu",
         max_epochs=30,
@@ -74,6 +89,13 @@ def train(root_dir: str, chiral_training: bool, use_pretrained: bool):
     trainer.fit(model, datamodule)
     trainer.save_checkpoint(checkpoint_path)
     model.save(model_dir)
+
+    artifact = wandb.Artifact(
+        name="chiral" if chiral_training else "no_chiral",
+        type="model",
+    )
+    artifact.add_dir(model_dir)
+    logger.experiment.log_artifact(artifact)
 
 
 def main():
@@ -92,9 +114,21 @@ def main():
         action=argparse.BooleanOptionalAction,
         help="Whether to train pretrained model",
     )
+    parser.add_argument(
+        "--version",
+        default="v0",
+        help="Version of the model to train",
+        required=False,
+    )
+    parser.add_argument(
+        "--notes",
+        default="",
+        help="Description of the experiment",
+        required=False,
+    )
 
     args = parser.parse_args()
-    train(args.root, args.chiral, args.use_pretrained)
+    train(args.root, args.chiral, args.use_pretrained, args.version, args.notes)
 
 
 if __name__ == "__main__":
