@@ -1,7 +1,8 @@
 import os
-import requests
 from typing import Literal
+
 import pytorch_lightning as pl
+import requests
 import torch
 from transformers import DataCollatorForLanguageModeling, PreTrainedTokenizerFast
 
@@ -91,7 +92,7 @@ class DataModule(pl.LightningDataModule):
 
     def setup(self, stage: str) -> None:
         if not os.path.exists(os.path.join(self.data_dir, "input_ids.pt")):
-            raise ValueError("Tokenized data is not exist.")
+            raise ValueError("Tokenized data do not exist.")
         self.input_ids = torch.load(os.path.join(self.data_dir, "input_ids.pt"))
 
         full_dataset = SmilesDataset(self.input_ids)

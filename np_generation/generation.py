@@ -14,18 +14,22 @@ class Generator:
                 do_sample=True,
                 top_p=0.84,
                 top_k=100,
+                eos_token_id=2,
+                pad_token_id=3,
             )
         self.tokenizer = PreTrainedTokenizerFast.from_pretrained(model_dir)
-        self.model: GPT2LMHeadModel = GPT2LMHeadModel.from_pretrained(
-            model_dir, pad_token_id=3
+        self.model: GPT2LMHeadModel = GPT2LMHeadModel.from_pretrained(model_dir).to( # type: ignore
+            "cuda" # type: ignore
         )
 
     def generate(self, inputs: Optional[torch.Tensor]) -> list[str]:
+        if inputs is not None:
+            inputs = inputs.cuda()
         outputs = self.model.generate(inputs=inputs, generation_config=self.config)
         decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
         return [output.replace(" ", "") for output in decoded_outputs]
 
     def batch_generate(self, num: int) -> list[str]:
         cls_token_id = 1
-        inputs = torch.full((num, 1), cls_token_id, dtype=int)
-        return self.generate(inputs)
+        inputs = torch.full((num, 1), fill_value=cls_token_id, dtype=int)
+        return self.generate(inputs.cuda())
