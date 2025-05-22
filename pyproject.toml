@@ -14,7 +14,6 @@ dependencies = [
     "wandb>=0.16.6",
     "smilespe>=0.0.3",
     "swig>=4.3.0",
-    "vina>=1.2.5",
     "ipykernel>=6.29.5",
     "polars>=1.8.2",
     "matplotlib>=3.7.5",

@@ -2083,7 +2083,6 @@ dependencies = [
     { name = "transformers", version = "4.46.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "transformers", version = "4.47.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "umap-learn" },
-    { name = "vina" },
     { name = "wandb" },
 ]
 
@@ -2111,7 +2110,6 @@ requires-dist = [
     { name = "torch", specifier = ">=2.3.0" },
     { name = "transformers", specifier = ">=4.40.1" },
     { name = "umap-learn", specifier = ">=0.5.7" },
-    { name = "vina", specifier = ">=1.2.5" },
     { name = "wandb", specifier = ">=0.16.6" },
 ]
 
@@ -4785,24 +4783,6 @@ resolution-markers = [
 sdist = { url = "https://files.pythonhosted.org/packages/aa/63/e53da845320b757bf29ef6a9062f5c669fe997973f966045cb019c3f4b66/urllib3-2.3.0.tar.gz", hash = "sha256:f8c5449b3cf0861679ce7e0503c7b44b5ec981bec0d1d3795a07f1ba96f0204d", size = 307268 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/19/4ec628951a74043532ca2cf5d97b7b14863931476d117c471e8e2b1eb39f/urllib3-2.3.0-py3-none-any.whl", hash = "sha256:1cee9ad369867bfdbbb48b7dd50374c0967a0bb7710050facf0dd6911440e3df", size = 128369 },
-]
-
-[[package]]
-name = "vina"
-version = "1.2.5"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy", version = "1.24.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "numpy", version = "2.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/75/b2/1dad979aea28fcca8aa06832744aa1b62ab80cad08980115a580a4861b8d/vina-1.2.5.tar.gz", hash = "sha256:7ccf2508bb82ba2c4e58100672b4a84d268989a320f7b6ccc316216931b983b1", size = 89500 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/08/35/b75cb68d631ced9f30b847ef7fd4e05da9de9ad929d1ac0d3970c46033ad/vina-1.2.5-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:37cd6f55a325b3b1b51176f2e3eaddbcf55a90853c3b474830c1eafb0f42052c", size = 819535 },
-    { url = "https://files.pythonhosted.org/packages/af/ec/a58ad83298c0cca43a0bd07bd4298b9a9a2fcf161bb800fb647f4873a5a6/vina-1.2.5-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ed14215e375a053d7fcccd93b52a83626ab10901ce670c4323fabfb20a8c74cd", size = 7214543 },
-    { url = "https://files.pythonhosted.org/packages/da/02/cc109dce0207afa17c36ffe1eea226cc463e9033fd82dfbd42b91a80d0bc/vina-1.2.5-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5182340adf1bb1ec859b899278b19f5f89403d3aa04f05408a7cabd2eca669fe", size = 7329641 },
-    { url = "https://files.pythonhosted.org/packages/0c/0a/ee19f0eb7cfe988f4477d8bea34676d0c21a4809a7a33263eada843fb013/vina-1.2.5-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:30a3a54549e80c3a5e7b3fd5f18024eeaedba86f5a689bf71ddb3f030162ede8", size = 819078 },
-    { url = "https://files.pythonhosted.org/packages/79/f0/29b81bc04c4b9a0298c1a2119e242e51fde98720023f9ee0c9dfafc7541d/vina-1.2.5-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:fd968770b9b5b8896e281ede21dd0a6c918f3413772f3ea0e00adab4c3f76599", size = 7244504 },
-    { url = "https://files.pythonhosted.org/packages/cd/8c/620ea7e4d2cc0bc1fe0a70cc10f8ee0751adee73f0b31b810e4d6bcc99ee/vina-1.2.5-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6fe097696e5a4e94d2791d5cf1ce81f197873f4bf35559e1042656fef4f5cd3c", size = 7350699 },
 ]
 
 [[package]]
