@@ -1,6 +1,6 @@
+import pytorch_lightning as pl
 import torch
 from transformers import GPT2LMHeadModel
-import pytorch_lightning as pl
 
 
 class NpGptModel(pl.LightningModule):

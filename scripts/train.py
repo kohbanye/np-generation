@@ -13,19 +13,11 @@ from np_generation.tokenizer import SmilesTokenizer
 
 
 def train(
-    root_dir: str,
-    chiral_training: bool,
-    use_pretrained: bool,
-    version: str,
-    notes: str,
+    root_dir: str, use_pretrained: bool, version: str, notes: str, dataset_name: str
 ):
     data_dir = os.path.join(root_dir, "data")
-    if chiral_training:
-        model_dir = os.path.join(root_dir, "model", "chiral")
-        smiles_filename = "coconut_chiral.smi"
-    else:
-        model_dir = os.path.join(root_dir, "model", "no_chiral")
-        smiles_filename = "coconut.smi"
+    model_dir = os.path.join(root_dir, "model", dataset_name)
+    smiles_filename = f"{dataset_name}.smi"
     checkpoint_path = os.path.join(model_dir, "checkpoint.ckpt")
     tokenizer_path = os.path.join(model_dir, "tokenizer.json")
 
@@ -69,9 +61,12 @@ def train(
 
     logger = WandbLogger(
         project="np-generation",
-        name=f"{'chiral' if chiral_training else 'no_chiral'}_{version}",
+        name=f"{dataset_name}_{version}",
         version=version,
-        tags=["np-generation", "chiral" if chiral_training else "no_chiral"],
+        tags=[
+            "np-generation",
+            dataset_name,
+        ],
         notes=notes,
         save_dir=model_dir,
         log_model=True,
@@ -91,7 +86,7 @@ def train(
     model.save(model_dir)
 
     artifact = wandb.Artifact(
-        name="chiral" if chiral_training else "no_chiral",
+        name=dataset_name,
         type="model",
     )
     artifact.add_dir(model_dir)
@@ -104,11 +99,6 @@ def main():
     )
 
     parser.add_argument("root", help="Root directory for data and models")
-    parser.add_argument(
-        "--chiral",
-        action=argparse.BooleanOptionalAction,
-        help="Whether to train on chiral dataset",
-    )
     parser.add_argument(
         "--use-pretrained",
         action=argparse.BooleanOptionalAction,
@@ -126,9 +116,21 @@ def main():
         help="Description of the experiment",
         required=False,
     )
+    parser.add_argument(
+        "--dataset",
+        default="coconut",
+        help="Name of the dataset to use (default: coconut)",
+        required=False,
+    )
 
     args = parser.parse_args()
-    train(args.root, args.chiral, args.use_pretrained, args.version, args.notes)
+    train(
+        args.root,
+        args.use_pretrained,
+        args.version,
+        args.notes,
+        args.dataset,
+    )
 
 
 if __name__ == "__main__":

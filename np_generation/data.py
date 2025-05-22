@@ -176,7 +176,11 @@ class CustomSmilesDataModule(pl.LightningDataModule):
                 smiles_type=self.smiles_type,
             )
         with open(os.path.join(self.data_dir, self.filename)) as f:
-            smiles_data = f.read().splitlines()
+            smiles_data = []
+            for line in f:
+                parts = line.strip().split()
+                if parts:
+                    smiles_data.append(parts[0])
 
         input_ids_filename = "input_ids_custom_smiles.pt"
         if os.path.exists(os.path.join(self.data_dir, input_ids_filename)):

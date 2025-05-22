@@ -20,7 +20,7 @@ def calc_descriptors(smiles_list: list[str]):
         print(len(desc))
         desc_list.append(desc)
     return desc_list
-a\
+
 
 if __name__ == "__main__":
     smiles_list = [
